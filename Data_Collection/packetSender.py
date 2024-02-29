@@ -70,17 +70,21 @@ class PacketSender:
         patterns = [self.P1, self.P2, self.P3, self.P4]
         return patterns
 
-    def sendPackets(self, pattern, events):
+    def getDestIP(self):
+        return self.dest
+
+    def sendPackets(self, pattern):
+        global events
         
         ipPacket = pattern()
         print(f'\t{ipPacket}')
 
-        print("\tSender: Waiting for emCollector")
-        events["emCollectorReady"].wait()
-        print("\tSender: EM collector ready detected")
+        print("\tSender: Waiting for sniffer")
+        events["pcktSnifferReady"].wait()
+        print("\tSender: Detected sniffer ready")
 
+        print("\tSender: Packet sending started...")
         events["pcktSendingStarted"].set()
-        print("\tSender: Packet sending started")
 
         send(ipPacket, count=self.burstLength, verbose=False, iface = self.iface)
 

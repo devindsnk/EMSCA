@@ -19,14 +19,16 @@ events = {
 
 def simulation():
     patterns = pcktSender.getPatterns()
+    destIP = pcktSender.getDestIP()
     freqs = emCollector.getFreqs()
+    
 
     for pattern in patterns:
         for freq in freqs:
 
-            threadPacketSender = threading.Thread(target=pcktSender.sendPackets, args=(pattern, events))
-            # threadPacketSniffer = threading.Thread(target=pcktSniffer.sniffPackets)
-            threadEMCollector = threading.Thread(target=emCollector.collectEMData, args=(pattern, freq, events))
+            threadPacketSender = threading.Thread(target=pcktSender.sendPackets, args=(pattern))
+            threadPacketSniffer = threading.Thread(target=pcktSniffer.sniffPackets, args=(pattern, freq, destIP))
+            threadEMCollector = threading.Thread(target=emCollector.collectEMData, args=(pattern, freq))
 
             threadPacketSender.start()
             threadEMCollector.start()
