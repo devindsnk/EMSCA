@@ -1,2 +1,6 @@
+Data_Collection/__pycache__/
 dataset/
 Data_Collection/data/
+Data_Collection/packets/
+Attack_Model/
+Data_Analysis/
