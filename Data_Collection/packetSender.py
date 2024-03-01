@@ -91,8 +91,7 @@ class PacketSender:
         return ipPacket
 
     def getPatterns(self):
-        # patterns = [self.P0, self.P1, self.P2, self.P3, self.P4, self.P5, self.P6]
-        patterns = [self.P5, self.P6]
+        patterns = [self.P0, self.P1, self.P2, self.P3, self.P4, self.P5, self.P6]
         return patterns
 
     def getDestIP(self):

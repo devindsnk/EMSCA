@@ -104,7 +104,7 @@ class EMCollector(gr.top_block):
         print("\temCollector: Detected packet sending completed")
         print("\temCollector: EM collecting stopping...")
         self.stopHackRF()
-        time.sleep(5)
+        time.sleep(2)
 
     def startHackRF(self) -> None:
         print("\temCollector: HackRf data collection started")
@@ -112,6 +112,7 @@ class EMCollector(gr.top_block):
 
     def stopHackRF(self) -> None:
         self.stop()
+        time.sleep(3)
         self.blocks_file_sink_0.close()
         print("\temCollector: HackRF data collection stopped")
         
