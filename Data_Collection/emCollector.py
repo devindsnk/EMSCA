@@ -84,8 +84,8 @@ class EMCollector(gr.top_block):
         self.disconnect_all()
         self.connect((self.osmosdr_source_0, 0), (self.blocks_file_sink_0, 0))
     
-    def collectEMData(self, pattern : str, freq : int):
-        global events
+    def collectEMData(self, pattern : str, freq : int, events):
+
         self.initDataCollection(pattern.__name__, freq)
 
         print(f"\temCollector: HackRF Ready ({freq}Mhz)")
@@ -96,23 +96,25 @@ class EMCollector(gr.top_block):
         print("\temCollector: Detected pcktSender started")
 
         print("\temCollector: EM collecting started...")
-        self.startHackRF()
+        threadHackRF = threading.Thread(target=self.startHackRF)
+        threadHackRF.start()
 
         print("\temCollector: Waiting for packet sending to complete")
         events["pcktSendingCompleted"].wait()
         print("\temCollector: Detected packet sending completed")
-
+        print("\temCollector: EM collecting stopping...")
         self.stopHackRF()
-        
+        time.sleep(2)
+
     def startHackRF(self) -> None:
         print("\temCollector: HackRf data collection started")
         self.run()
 
     def stopHackRF(self) -> None:
         self.stop()
-        time.sleep(2)
+        time.sleep(3)
         self.blocks_file_sink_0.close()
-        print("\temCollector : HackRF data collection stopped")
+        print("\temCollector: HackRF data collection stopped")
         
         
 

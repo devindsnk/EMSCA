@@ -1,2 +1,5 @@
-dataset/
-Data_Collection/data/
+Attack_Model/
+Data_Analysis/
+*.pyc
+*.iq
+*.pcap

@@ -26,19 +26,22 @@ def simulation():
     for pattern in patterns:
         for freq in freqs:
 
-            threadPacketSender = threading.Thread(target=pcktSender.sendPackets, args=(pattern))
-            threadPacketSniffer = threading.Thread(target=pcktSniffer.sniffPackets, args=(pattern, freq, destIP))
-            threadEMCollector = threading.Thread(target=emCollector.collectEMData, args=(pattern, freq))
+            print(f"\n\n\t====== Pattern {pattern.__name__} : {freq}Mhz=====\n")
+            threadPacketSender = threading.Thread(target=pcktSender.sendPackets, args=(pattern, events))
+            threadPacketSniffer = threading.Thread(target=pcktSniffer.sniffPackets, args=(pattern, freq, destIP, events))
+            threadEMCollector = threading.Thread(target=emCollector.collectEMData, args=(pattern, freq, events))
 
             threadPacketSender.start()
             threadEMCollector.start()
+            threadPacketSniffer.start()
 
             threadPacketSender.join()
             threadEMCollector.join()
+            threadPacketSniffer.join()
 
-    #         # self.initTransmission(pattern.__name__, freq)
-
-
-    #         self.sendPackets(pattern)
+            events["pcktSnifferReady"].clear()
+            events["emCollectorReady"].clear()
+            events["pcktSendingStarted"].clear()
+            events["pcktSendingCompleted"].clear()
 
 simulation()

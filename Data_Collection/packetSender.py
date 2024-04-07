@@ -18,9 +18,13 @@ class PacketSender:
         self.src = pcktSenderConfig['source']
         self.dest = pcktSenderConfig['destination']
         self.iface = pcktSenderConfig['iface']
-        self.burstLength = int(pcktSenderConfig['burstLength'])
+        self.burstDuration = float(pcktSenderConfig['burstDuration'])
         
         # print("Src: ", self.src, "\nDest: ", self.dest, "\nInterface:", self.iface)
+
+    def P0(self) -> None:
+        '''IDLE Line No Traffic'''
+        return None
 
     def P1(self) -> IP:
         ''' P1 : all 0 UDP '''
@@ -66,16 +70,34 @@ class PacketSender:
 
         return ipPacket
 
+    def P5(self) -> IP:
+        ''' P5 : all 0 raw IP packet '''
+        # Max unfragmented packet size : 1500 bytes 
+        # IP header : 20 bytes
+        # Payload : 1480
+        payload = bytearray(1480)
+        ipPacket = IP(dst=self.dest)/Raw(load=payload)
+
+        return ipPacket
+
+    def P6(self) -> IP:
+        ''' P6 : all 1 raw IP packet '''
+        # Max unfragmented packet size : 1500 bytes 
+        # IP header : 20 bytes
+        # Payload : 1480
+        payload = bytearray([255]*1480)
+        ipPacket = IP(dst=self.dest)/Raw(load=payload)
+
+        return ipPacket
+
     def getPatterns(self):
-        patterns = [self.P1, self.P2, self.P3, self.P4]
+        patterns = [self.P0, self.P1, self.P2, self.P3, self.P4, self.P5, self.P6]
         return patterns
 
     def getDestIP(self):
         return self.dest
 
-    def sendPackets(self, pattern):
-        global events
-        
+    def sendPackets(self, pattern, events):
         ipPacket = pattern()
         print(f'\t{ipPacket}')
 
@@ -86,13 +108,12 @@ class PacketSender:
         print("\tSender: Packet sending started...")
         events["pcktSendingStarted"].set()
 
-        send(ipPacket, count=self.burstLength, verbose=False, iface = self.iface)
+        endTime = time.time() + self.burstDuration
 
-        events["pcktSendingCompleted"].set()
+        while time.time() < endTime:
+            if(ipPacket):
+                send(ipPacket, verbose=False, iface = self.iface)
+        
         print("\tSender: Packet sending completed\n")
-
-        # NDD : end sniffing
-
-    
-
-
+        events["pcktSendingCompleted"].set()
+        
